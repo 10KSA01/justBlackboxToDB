@@ -1,0 +1,12 @@
+{
+    "host": "test-jacharku.postgres.database.azure.com",
+    "dbname": "testing",
+    "user": "jacharku",
+    "password": "TestServer123",
+    "tablename": "main",
+    "log_file_path": ".\\blackbox-db\\logs\\SunburySQAZettlerRig.log",
+    "timestamp": "2023-04-22 10:25:20",
+    "cooldown": 15,
+    "save_local": true,
+    "local_file_path": ".\\blackbox-db\\logs\\main.csv"
+}
