@@ -38,7 +38,9 @@ class BlackboxToDB:
         self.timestamp = datetime.strptime(config_data["timestamp"], "%Y-%m-%d %H:%M:%S")
         self.cooldown = config_data["cooldown"]
         self.save_local = config_data["save_local"]
+        self.save_as_new = config_data["save_as_new"]
         self.local_file_path = config_data["local_file_path"]
+        self.replace_table = config_data["replace_table"]
         
         return self
     
@@ -114,6 +116,7 @@ class BlackboxToDB:
         # create connection string
         # conn_string = "postgresql://{0}:{1}@{2}:5432/{3}?sslmode=require".format(self.user, self.password, self.host, self.dbname)
         conn_string = f"postgresql://{self.user}:{self.password}@{self.host}:5432/{self.dbname}?sslmode=require"
+        
         # create engine
         engine = create_engine(conn_string)
 
@@ -132,7 +135,10 @@ class BlackboxToDB:
         }
 
         # write DataFrame to table
-        self.df[columns_to_upload].to_sql(self.tablename, engine, if_exists='append', index=False, dtype=dtypes) 
+        if (self.replace_table):
+            self.df[columns_to_upload].to_sql(self.tablename, engine, if_exists='replace', index=False, dtype=dtypes)
+        else:
+            self.df[columns_to_upload].to_sql(self.tablename, engine, if_exists='append', index=False, dtype=dtypes)
         
     def saving_locally(self):
         # Save the last timestamp to the file
@@ -145,14 +151,17 @@ class BlackboxToDB:
         
         # if save_local is set to false, it will not save locally
         # save_local & local_file_path can be configured in the config.json file
-        if (self.save_local):
-            print("Saving locally\n")
+        if (self.save_local):          
+            if (self.save_as_new):
+                print("Saving locally as new file\n")
+                self.df.to_csv(self.local_file_path, index=False)
+            else:
+                print("Saving locally appending file\n")              
+                self.df.to_csv(self.local_file_path, mode='a', header=False, index=False)
             
-        with open(self.local_file_path, 'a') as f:
-            # Append to the file and write header only if file is empty
-            self.df.to_csv(f, index=False, header=f.tell() == 0) 
-        
-        print(self.df)
+            print(self.df)
+        else:
+            print("Not saving locally\n")
         
     def return_df(self):
         return self.df
