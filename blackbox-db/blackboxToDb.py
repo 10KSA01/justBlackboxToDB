@@ -34,13 +34,14 @@ class BlackboxToDB:
         self.tablename = config_data["tablename"]
         
         # Others
-        self.log_file_path = config_data["log_file_path"]
+        self.find_log_file_path = config_data["find_log_file_path"]
         self.timestamp = datetime.strptime(config_data["timestamp"], "%Y-%m-%d %H:%M:%S")
         self.cooldown = config_data["cooldown"]
         self.save_local = config_data["save_local"]
-        self.save_as_new = config_data["save_as_new"]
-        self.local_file_path = config_data["local_file_path"]
+        self.replace_file = config_data["replace_file"]
+        self.save_local_file_path = config_data["save_local_file_path"]
         self.replace_table = config_data["replace_table"]
+        self.save_only_colunm = config_data["save_only_colunm"]
         
         return self
     
@@ -66,7 +67,7 @@ class BlackboxToDB:
     def loading(self):
         print("Loading \n") 
         # read csv file into DataFrame
-        self.df = pd.read_csv(self.log_file_path)
+        self.df = pd.read_csv(self.find_log_file_path)
         
         # Convert timestamp column to datetime format
         self.df["datetime"] = pd.to_datetime(self.df['datetime'], format='%a %b %d %H:%M:%S %Y')
@@ -93,6 +94,8 @@ class BlackboxToDB:
         self.df['logical_point_zone'] = self.df['logical_point_zone'].replace('Zone N/A', error400)
         self.df['point_number'] = self.df['point_number'].replace('No Physical Address Provided', error400)
         self.df['point_number'] = self.df['point_number'].replace('All', all300)
+        self.df['sector_id'] = self.df['point_number'].replace('Not in Sector', all300)
+
 
         # Convert float64 columns to int64
         self.df[float_to_int64] = self.df[float_to_int64].astype('Int64')
@@ -150,14 +153,20 @@ class BlackboxToDB:
         self.save_last_timestamp()
         
         # if save_local is set to false, it will not save locally
-        # save_local & local_file_path can be configured in the config.json file
-        if (self.save_local):          
-            if (self.save_as_new):
+        # save_local & save_local_file_path can be configured in the config.json file
+        if (self.save_local):         
+            if (self.replace_file):
                 print("Saving locally as new file\n")
-                self.df.to_csv(self.local_file_path, index=False)
+                if (self.save_only_colunm):
+                    self.df[columns_to_upload].to_csv(self.save_local_file_path, index=False)
+                else:
+                    self.df.to_csv(self.save_local_file_path, index=False)
             else:
-                print("Saving locally appending file\n")              
-                self.df.to_csv(self.local_file_path, mode='a', header=False, index=False)
+                print("Saving locally appending file\n")
+                if (self.save_only_colunm):              
+                    self.df[columns_to_upload].to_csv(self.save_local_file_path, mode='a', header=False, index=False)
+                else:
+                    self.df.to_csv(self.save_local_file_path, mode='a', header=False, index=False)
             
             print(self.df)
         else:
@@ -168,6 +177,7 @@ class BlackboxToDB:
     
 
 def main():
+    print("Initialising \n")
     clock = Clock(start=True)
     blackbox_to_db = BlackboxToDB()
     
