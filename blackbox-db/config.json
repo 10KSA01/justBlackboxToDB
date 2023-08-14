@@ -3,10 +3,13 @@
     "dbname": "testing",
     "user": "jacharku",
     "password": "TestServer123",
-    "tablename": "main",
-    "log_file_path": ".\\blackbox-db\\logs\\SunburySQAZettlerRig.log",
+    "tablename": "t08-08-23",
+    "find_log_file_path": ".\\logs\\SunburySQAZettlerRig.log",
     "timestamp": "2023-04-22 10:25:20",
     "cooldown": 15,
+    "save_local_file_path": ".\\logs\\08-08-23.csv",
     "save_local": true,
-    "local_file_path": ".\\blackbox-db\\logs\\main.csv"
+    "replace_file": true,
+    "replace_table": true,
+    "save_only_colunm": true
 }
