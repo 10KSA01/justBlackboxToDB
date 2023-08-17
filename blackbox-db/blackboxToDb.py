@@ -87,7 +87,7 @@ class BlackboxToDB:
         # Remove rows with all null values
         self.df.dropna(how='all', inplace=True)
 
-        # Replace empty values to appropriate values
+        # Replace empty/blanks values to appropriate values
         self.df.fillna(column_na_defaults, inplace=True)
 
         # Replacing string values with error code
@@ -95,7 +95,6 @@ class BlackboxToDB:
         self.df['point_number'] = self.df['point_number'].replace('No Physical Address Provided', error400)
         self.df['point_number'] = self.df['point_number'].replace('All', all300)
         self.df['sector_id'] = self.df['point_number'].replace('Not in Sector', all300)
-
 
         # Convert float64 columns to int64
         self.df[float_to_int64] = self.df[float_to_int64].astype('Int64')
@@ -122,20 +121,6 @@ class BlackboxToDB:
         
         # create engine
         engine = create_engine(conn_string)
-
-        # Define the column data types
-        dtypes = {
-            'id':                   sa.String(length=50),
-            'datetime':             sa.TIMESTAMP(),
-            'reply_status':         sa.String(length=10),
-            'node':                 sa.Integer(),
-            'channel_address':      sa.Integer(),
-            'point_number':         sa.String(length=50),
-            'logical_point_number': sa.Integer(),
-            'logical_point_zone':   sa.String(length=20),
-            'device_type':          sa.String(length=50),
-            'dirtiness':            sa.Integer(),
-        }
 
         # write DataFrame to table
         if (self.replace_table):

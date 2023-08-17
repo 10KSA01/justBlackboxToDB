@@ -3,13 +3,13 @@
     "dbname": "testing",
     "user": "jacharku",
     "password": "TestServer123",
-    "tablename": "t08-08-23",
+    "tablename": "t17-08-23",
     "find_log_file_path": ".\\logs\\SunburySQAZettlerRig.log",
     "timestamp": "2023-04-22 10:25:20",
     "cooldown": 15,
-    "save_local_file_path": ".\\logs\\08-08-23.csv",
+    "save_local_file_path": ".\\logs\\t17-08-23.csv",
     "save_local": true,
-    "replace_file": true,
-    "replace_table": true,
+    "replace_file": false,
+    "replace_table": false,
     "save_only_colunm": true
 }
