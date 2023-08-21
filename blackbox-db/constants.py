@@ -10,6 +10,7 @@ column_na_defaults = {
     'channel_address':             error400,
     'point_category':             'None',
     'device_type':                'None',
+    'raw_lta':                     error400,
     'dirtiness':                   error400,
     'loop_type':                  'None',
     'units_of_measure1':          'None',
@@ -19,6 +20,11 @@ column_na_defaults = {
     'converted_value2':            error400,
     'converted_value3':            error400,
     'instantaneous_active_state': 'None',
+    'instantaneous_fault_state' :  error400,
+    'confirmed_active_state':      error400,
+    'confirmed_fault_state':       error400,
+    'acknowledged_active_state':   error400,
+    'acknowledged_fault_state' :   error400,
     'output_forced_mode':         'None',
     'output_unforced_state':      'None',
     'output_forced_state':        'None'
@@ -48,6 +54,50 @@ columns_to_upload = [
     'converted_value3'
 ]
 
+all_dtypes = {
+    "id": str,
+    "datetime": str,
+    "reply_status": str,
+    "flags": str,
+    "node": str,
+    "channel": str,
+    "channel_address": str,
+    "postr_category": str,
+    "postr_number": str,
+    "logical_postr_number": str,
+    "logical_postr_zone": str,
+    "device_type": str,
+    "auxiliary_postr_attributes": str,
+    "group": str,
+    "area_type": str,
+    "area_number": str,
+    "sector_id": str,
+    "loop_type": str,
+    "raw_identity": str,
+    "actual_device_type": str,
+    "mode_and_sensitivity": str,
+    "raw_analogue_values1": str,
+    "raw_analogue_values2": str,
+    "raw_analogue_values3": str,
+    "lta_flags": str,
+    "raw_lta": str,
+    "dirtiness": str,
+    "units_of_measure1": str,
+    "units_of_measure2": str,
+    "units_of_measure3": str,
+    "converted_value1": str,
+    "converted_value2": str,
+    "converted_value3": str,
+    "instantaneous_active_state": str,
+    "instantaneous_fault_state": str,
+    "confirmed_active_state": str,
+    "confirmed_fault_state": str,
+    "acknowledged_active_state": str,
+    "acknowledged_fault_state": str,
+    "output_forced_mode": str,
+    "output_unforced_state": str,
+    "output_forced_state": str
+}
 # Define the column data types
 dtypes = {
     'id':                   sa.String(length=30),
@@ -94,7 +144,7 @@ float_to_int64 = [
     'confirmed_fault_state', 
     'acknowledged_active_state', 
     'acknowledged_fault_state'
-]
+    ]
         
 unique_id = [
     'node', 
@@ -102,5 +152,5 @@ unique_id = [
     'point_number', 
     'logical_point_number', 
     'logical_point_zone'
-]
+    ]
         
