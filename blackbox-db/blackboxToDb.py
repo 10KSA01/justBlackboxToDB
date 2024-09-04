@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 from sqlalchemy import create_engine
-import sqlalchemy as sa
 from constants import *
 from clock import Clock
 from datetime import datetime
@@ -25,7 +24,7 @@ class BlackboxToDB:
 
         return config_file_path
         
-    def load_config(self):         
+    def load_config(self):
         with open(self.find_config(), 'r') as config_file:
             config_data = json.load(config_file)
         
@@ -98,7 +97,7 @@ class BlackboxToDB:
         self.df["datetime"] = pd.to_datetime(self.df['datetime'], format='%a %b %d %H:%M:%S %Y')
         
     def analysing(self):
-        print("Analysing \n")            
+        print("Analysing \n")
         # Filter data from the last timestamp onwards
         self.df = self.df[self.df['datetime'] > self.last_timestamp]
 
@@ -119,10 +118,15 @@ class BlackboxToDB:
         self.df['logical_point_zone'] = self.df['logical_point_zone'].replace('Zone N/A', error400)
         self.df['point_number'] = self.df['point_number'].replace('No Physical Address Provided', error400)
         self.df['point_number'] = self.df['point_number'].replace('All', all300)
-        self.df['sector_id'] = self.df['point_number'].replace('Not in Sector', all300)
+        self.df['sector_id'] = self.df['sector_id'].replace('Not in Sector', all300)
 
         # Convert float64 columns to int64
-        self.df[float_to_int64] = self.df[float_to_int64].astype(int)
+        self.df[float_to_int64] = self.df[float_to_int64].astype(float).astype(int)
+        
+        # Absolute any value so that there are no negatives
+        self.df['converted_value1'] = self.df['converted_value1'].abs()
+        self.df['converted_value2'] = self.df['converted_value2'].abs()
+        self.df['converted_value3'] = self.df['converted_value3'].abs()
              
         # Creating unique id column
         self.df['id'] = self.df[unique_id].astype(str).apply(lambda x: '_'.join(x).zfill(3), axis=1)
@@ -137,12 +141,12 @@ class BlackboxToDB:
         # Remove duplicates
         self.df = self.df.drop_duplicates()
                 
-    def uploading(self):        
+    def uploading(self):
         print("Uploading \n")
         
         # create connection string
         # conn_string = "postgresql://{0}:{1}@{2}:5432/{3}?sslmode=require".format(self.user, self.password, self.host, self.dbname)
-        conn_string = f"postgresql://{self.user}:{self.password}@{self.host}:5432/{self.dbname}?sslmode=require"
+        conn_string = f"postgresql://{self.user}:{self.password}@{self.host}:5432/{self.dbname}"
         
         # create engine
         engine = create_engine(conn_string)
@@ -164,7 +168,7 @@ class BlackboxToDB:
         
         # if save_local is set to false, it will not save locally
         # save_local & save_local_file_path can be configured in the config.json file
-        if (self.save_local):         
+        if (self.save_local):
             if (self.replace_file):
                 print("Saving locally as new file\n")
                 if (self.save_only_colunm):
@@ -173,7 +177,7 @@ class BlackboxToDB:
                     self.df.to_csv(self.save_local_file_path, index=False)
             else:
                 print("Saving locally appending file\n")
-                if (self.save_only_colunm):              
+                if (self.save_only_colunm):
                     self.df[columns_to_upload].to_csv(self.save_local_file_path, mode='a', header=False, index=False)
                 else:
                     self.df.to_csv(self.save_local_file_path, mode='a', header=False, index=False)
@@ -192,7 +196,7 @@ def main():
     blackbox_to_db = BlackboxToDB()
     
     while True:
-        if clock.time_elapsed(blackbox_to_db.cooldown):
+        if clock.time_elapsed(5):
             print("Connecting \n")
             if not blackbox_to_db.check_internet_connection():
                 print(f"No internet connection. Retrying in {blackbox_to_db.reconnect_timer} seconds...")
